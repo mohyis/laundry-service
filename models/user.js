@@ -17,18 +17,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    otp: {
+    role: {
         type: String,
+        enum: ['user', 'admin', 'manager', 'customer'],
+        default: 'user',
         require: true
-    },
-    otpExpiresAt: {
-        type: Date
-    },
-    isVerified: {
-        type: Boolean,
-        default: false
     }
-
 }, {timestamps: true})
 
 const userModel = mongoose.model('user', userSchema)

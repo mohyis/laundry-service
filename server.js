@@ -1,16 +1,33 @@
 const express = require('express')
 require('dotenv').config()
 const mongoose = require('mongoose');
+const passport = require('passport')
+const userRouter = require('./router/userRouter')
+const expressSession = require('express-session')
 const app = express()
 const PORT = 5907
 
+require('./controller/googleAuth')
+
 app.use(express.json())
+app.use(expressSession({secret: "mohyis", saveUninitialized: false, resave: false}))
 app.use(passport.initialize())
 app.use(passport.session())
+app.use('/api/v1/user', userRouter)
 
 
+// app.use((req, res , next)=>{
+//     res.status(500).json({
+//         message: `route ${req.originalUrl} and ${req.method} not found`
+//     })
+// })
 
-
+app.use((error, req, res , next)=>{
+    res.status(500).json({
+        message: error.message, 
+        status: error.statusCode
+    })
+})
 
 
 mongoose.connect(process.env.DB_URI).then(()=>{
