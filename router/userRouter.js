@@ -1,8 +1,14 @@
 const router = require('express').Router()
 const passport = require('passport')
+const { register, login } = require('../controller/userController')
+const { authenticator } = require('../middleware/validation')
+
+router.post('/register', register)
+router.post('/login', login)
 
 router.get('/googleAuth', passport.authenticate("google", {scope: ["profile", "email"]}))
-router.get('/googleLogin', passport.authenticate('google',{successRedirect: "/api/user/success", failureRedirect: "/api/user/failed"}))
+router.get('/googleLogin', passport.authenticate('google',
+    {successRedirect: "/api/user/success", failureRedirect: "/api/user/failed"}))
 
 router.get('/success', (req, res)=>{
     res.json({
@@ -16,3 +22,5 @@ router.get('/failed', (req, res)=>{
         message: "login Failed"
     })
 })
+
+module.exports = router

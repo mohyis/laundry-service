@@ -1,6 +1,8 @@
 const userModel = require('../models/user')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
-exports.createUser = async(req, res)=>{
+exports.register = async(req, res)=>{
     try {
         const {firstName, lastName, email, password, confirmPassword} = req.body
 
@@ -10,11 +12,14 @@ exports.createUser = async(req, res)=>{
             })
         }
 
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+
         const user = await userModel.create({
             firstName,
             lastName,
             email,
-            password
+            password: hashedPassword
         })
 
         const data = {
@@ -27,10 +32,6 @@ exports.createUser = async(req, res)=>{
             message: 'account created',
             data
         })
-
-
-
-
         
     } catch (error) {
         res.status(500).json(
@@ -38,5 +39,71 @@ exports.createUser = async(req, res)=>{
                 message: error.message
             }
         )
+    }
+}
+
+exports.login = async(req,res, next)=>{
+    try {
+        const {email, password} = req.body
+        const user  = await userModel.findOne({email})
+        if(!user){
+            return next({
+        message: 'user not found', 
+        statusCode: 404
+      })
+        };
+
+    //     if(user.isVerified == false){
+    //         return next({
+    //     message: 'please verify your email', 
+    //     statusCode: 400
+    //   })
+
+      //  }
+
+        // check if account is locked due to many failed login attempts
+
+        // if( user.lockUntil > Date.now()) {
+        //     return next({
+        //         message: `Account locked until ${user.lockUntil}`,
+        //         statusCode: 403
+        //     })
+        // }
+
+        const passwordCorrect = await bcrypt.compare(password, user.password)
+        if(!passwordCorrect){
+            // increment login attempt and lock account if necessary
+
+            // user.loginAttempts += 1;
+            // if (user.loginAttempts >=5) {
+            //     user.lockUntil = new Date(Date.now() + 2 * 60000);
+            //     user.loginAttempts = 0
+            // }
+
+        //     await user.save()
+            
+            return next({
+        message: 'invalid credentials', 
+        statusCode: 400
+      })
+        }   
+
+        // reset login attempts on successful login
+        // user.loginAttempts = 0;
+        // await user.save();
+
+        const token = await jwt.sign({ 
+            id: user._id, email: user.email}, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '1 hour'})
+
+        res.status(200).json({
+            message: 'login successfully',
+            token
+        })
+
+
+    } catch (error) {
+        next(error)
     }
 }
