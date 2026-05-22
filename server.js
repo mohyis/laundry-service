@@ -2,7 +2,7 @@ const express = require('express')
 require('dotenv').config()
 const mongoose = require('mongoose');
 const passport = require('passport')
-const userRouter = require('./router/userRouter')
+const adminRouter = require('./router/adminRouter')
 const expressSession = require('express-session')
 const app = express()
 const PORT = 5907
@@ -13,7 +13,7 @@ app.use(express.json())
 app.use(expressSession({secret: "mohyis", saveUninitialized: false, resave: false}))
 app.use(passport.initialize())
 app.use(passport.session())
-app.use('/api/v1/user', userRouter)
+app.use('/api/admin', adminRouter)
 
 
 // app.use((req, res , next)=>{
