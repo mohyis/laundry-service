@@ -11,7 +11,8 @@ const orderSchema = new mongoose.Schema({
     },
     orderId: {
         type: String,  
-        required: true
+        required: true,
+        unique: true
     },
     item: {
         type: String,  
@@ -31,8 +32,7 @@ const orderSchema = new mongoose.Schema({
     },
     paymentMode: {
         type: String,
-        enum: ["cash", "transfer", "pos"],
-        required: true
+        enum: ["cash", "transfer", "pos"]
     },
     bookingDate: {
         type: Date,
@@ -40,12 +40,10 @@ const orderSchema = new mongoose.Schema({
     },
     readyDate: {
         type: Date,
-        required: true
     },
     deliveryMode: {
         type: String,
-        enum: ["pick-up", "delivery"],
-        required: true
+        enum: ["pick-up", "delivery"]
     },
     address: {
         type: String,
