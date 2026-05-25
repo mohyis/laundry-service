@@ -40,7 +40,7 @@ const { checkAdmin } = require('../middleware/validation');
 
 /**
  * @swagger
- * /api/v1/message/message:
+ * /api/message/message:
  *   post:
  *     tags:
  *       - Message
@@ -88,7 +88,7 @@ router.post('/message', createMessage);
 
 /**
  * @swagger
- * /api/v1/message/messages:
+ * /api/message/messages:
  *   get:
  *     tags:
  *       - Message
@@ -116,7 +116,7 @@ router.get('/messages', checkAdmin, getAllMessages);
 
 /**
  * @swagger
- * /api/v1/message/messages/{id}:
+ * /api/message/messages/{id}:
  *   get:
  *     tags:
  *       - Message
