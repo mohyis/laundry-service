@@ -57,7 +57,7 @@ const { checkAdmin } = require('../middleware/validation');
 
 /**
  * @swagger
- * /api/v1/customer/register:
+ * /api/customer/register:
  *   post:
  *     tags:
  *       - Customer
@@ -121,7 +121,7 @@ router.post('/register', checkAdmin, createCustomer);
 
 /**
  * @swagger
- * /api/v1/customer/customers:
+ * /api/customer/customers:
  *   get:
  *     tags:
  *       - Customer
@@ -149,7 +149,7 @@ router.get('/customers', checkAdmin, getAllCustomers);
 
 /**
  * @swagger
- * /api/v1/customer/customers/{id}:
+ * /api/customer/customers/{id}:
  *   get:
  *     tags:
  *       - Customer

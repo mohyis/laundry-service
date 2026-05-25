@@ -87,7 +87,7 @@ const { checkAdmin } = require('../middleware/validation');
 
 /**
  * @swagger
- * /api/v1/staff/register:
+ * /api/staff/register:
  *   post:
  *     tags:
  *       - Staff
@@ -182,7 +182,7 @@ router.post('/register', checkAdmin, createStaff);
 
 /**
  * @swagger
- * /api/v1/staff/staffs:
+ * /api/staff/staffs:
  *   get:
  *     tags:
  *       - Staff
@@ -210,7 +210,7 @@ router.get('/staffs', checkAdmin, getAllStaff);
 
 /**
  * @swagger
- * /api/v1/staff/staffs/{id}:
+ * /api/staff/staffs/{id}:
  *   get:
  *     tags:
  *       - Staff
@@ -254,7 +254,7 @@ router.get('/staffs/:id', checkAdmin, getOneStaff);
 
 /**
  * @swagger
- * /api/v1/staff/staffs/{id}:
+ * /api/staff/staffs/{id}:
  *   put:
  *     tags:
  *       - Staff
@@ -326,7 +326,7 @@ router.put('/staffs/:id', checkAdmin, updateStaff);
 
 /**
  * @swagger
- * /api/v1/staff/staffs/{id}:
+ * /api/staff/staffs/{id}:
  *   delete:
  *     tags:
  *       - Staff

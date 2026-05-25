@@ -100,7 +100,7 @@ const { checkAdmin } = require('../middleware/validation');
 
 /**
  * @swagger
- * /api/v1/order/create-order/{id}:
+ * /api/order/create-order/{id}:
  *   post:
  *     tags:
  *       - Order
@@ -179,7 +179,7 @@ router.post('/create-order/:id', checkAdmin, createOrder);
 
 /**
  * @swagger
- * /api/v1/order/orders:
+ * /api/order/orders:
  *   get:
  *     tags:
  *       - Order
@@ -238,7 +238,7 @@ router.get('/schedules/completed', checkAdmin, getAllCompletedOrders);
 
 /**
  * @swagger
- * /api/v1/order/orders/{id}:
+ * /api/order/orders/{id}:
  *   get:
  *     tags:
  *       - Order
@@ -282,7 +282,7 @@ router.get('/orders/:id', checkAdmin, getOneOrder);
 
 /**
  * @swagger
- * /api/v1/order/order-status/{id}:
+ * /api/order/order-status/{id}:
  *   put:
  *     tags:
  *       - Order
@@ -344,7 +344,7 @@ router.delete('/orders/:id', checkAdmin, deleteOrder);
 
 /**
  * @swagger
- * /api/v1/order/create-schedule:
+ * /api/order/create-schedule:
  *   post:
  *     tags:
  *       - Order
@@ -437,7 +437,7 @@ router.post('/create-schedule', scheduleRateLimiter, createSchedule);
 
 /**
  * @swagger
- * /api/v1/order/schedules/completed:
+ * /api/order/schedules/completed:
  *   get:
  *     tags:
  *       - Order
@@ -493,7 +493,7 @@ router.post('/completed-schedule', checkAdmin, getCompletedOrderSchedules)
 
 /**
  * @swagger
- * /api/v1/order/schedules/{id}:
+ * /api/order/schedules/{id}:
  *   put:
  *     tags:
  *       - Order

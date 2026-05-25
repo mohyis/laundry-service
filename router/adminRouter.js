@@ -42,7 +42,7 @@ const { register, login } = require('../controller/adminController')
 
 /**
  * @swagger
- * /api/v1/admin/register:
+ * /api/admin/register:
  *   post:
  *     tags:
  *       - Admin
@@ -96,7 +96,7 @@ router.post('/register', register)
 
 /**
  * @swagger
- * /api/v1/admin/login:
+ * /api/admin/login:
  *   post:
  *     tags:
  *       - Admin
@@ -135,7 +135,7 @@ router.post('/login', login)
 
 /**
  * @swagger
- * /api/v1/admin/googleAuth:
+ * /api/admin/googleAuth:
  *   get:
  *     tags:
  *       - Admin
@@ -150,7 +150,7 @@ router.get('/googleAuth', passport.authenticate("google", {scope: ["profile", "e
 
 /**
  * @swagger
- * /api/v1/admin/googleLogin:
+ * /api/admin/googleLogin:
  *   get:
  *     tags:
  *       - Admin
@@ -160,11 +160,11 @@ router.get('/googleAuth', passport.authenticate("google", {scope: ["profile", "e
  *       200:
  *         description: login success redirect or failure redirect
  */
-router.get('/googleLogin', passport.authenticate("google", {successRedirect: "/api/user/success", failureRedirect: "/api/user/failed"}))
+router.get('/googleLogin', passport.authenticate("google", {successRedirect: "/api/admin/success", failureRedirect: "/api/admin/failed"}))
 
 /**
  * @swagger
- * /api/v1/admin/success:
+ * /api/admin/success:
  *   get:
  *     tags:
  *       - Admin
@@ -183,7 +183,7 @@ router.get('/success', (req, res)=>{
 
 /**
  * @swagger
- * /api/v1/admin/failed:
+ * /api/admin/failed:
  *   get:
  *     tags:
  *       - Admin

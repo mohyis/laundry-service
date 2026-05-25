@@ -67,7 +67,7 @@ const { paymentRateLimiter } = require('../middleware/rateLimiter');
 
 /**
  * @swagger
- * /api/v1/payment/payment/{id}:
+ * /api/payment/payment/{id}:
  *   post:
  *     tags:
  *       - Payment
@@ -117,7 +117,7 @@ router.post('/payment/:id', paymentRateLimiter, payOrder)
 
 /**
  * @swagger
- * /api/v1/payment/verify-payment:
+ * /api/payment/verify-payment:
  *   get:
  *     tags:
  *       - Payment
