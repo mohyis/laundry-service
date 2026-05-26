@@ -22,6 +22,12 @@ const adminSchema = new mongoose.Schema({
         default: "admin",
         require: true
     },
+    loginAttempts: {
+        type: Number,
+        default: 0
+    },
+    lockUntil: {
+        type: Date
     profilePicture: {
         url: {
             type: String,
