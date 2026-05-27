@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cloudinary = require('../config/cloudinary')
 const fs = require('fs')
+const redisClient = require('../redisConfig/redis')
 
 
 exports.register = async (req, res) => {
@@ -82,28 +83,29 @@ exports.login = async (req, res, next) => {
         //   })
 
         //  }
+    //    }
 
         // check if account is locked due to many failed login attempts
 
-        // if( user.lockUntil > Date.now()) {
-        //     return next({
-        //         message: `Account locked until ${user.lockUntil}`,
-        //         statusCode: 403
-        //     })
-        // }
+        if( user.lockUntil > Date.now()) {
+            return next({
+                message: `Account locked until ${user.lockUntil}`,
+                statusCode: 403
+            })
+        }
 
         const passwordCorrect = await bcrypt.compare(password, user.password)
         if (!passwordCorrect) {
             // increment login attempt and lock account if necessary
 
-            // user.loginAttempts += 1;
-            // if (user.loginAttempts >=5) {
-            //     user.lockUntil = new Date(Date.now() + 2 * 60000);
-            //     user.loginAttempts = 0
-            // }
+            user.loginAttempts += 1;
+            if (user.loginAttempts >=5) {
+                user.lockUntil = new Date(Date.now() + 2 * 60000);
+                user.loginAttempts = 0
+            }
 
-            //     await user.save()
-
+            await user.save()
+            
             return next({
                 message: 'invalid credentials',
                 statusCode: 400
@@ -111,21 +113,46 @@ exports.login = async (req, res, next) => {
         }
 
         // reset login attempts on successful login
-        // user.loginAttempts = 0;
-        // await user.save();
+        user.loginAttempts = 0;
+        await user.save();
 
         const token = await jwt.sign({
             id: user._id, email: user.email
         },
             process.env.JWT_SECRET,
             { expiresIn: '1 day' })
+            redisClient.del(`user: ${user._id}`)
+            redisClient.set(`user: ${user._id}`, token, {EX: 86400})
+
+            const data = {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+        }
 
         res.status(200).json({
             message: 'login successfully',
+            data,
             token
         })
 
 
+    } catch (error) {
+        next(error)
+    }
+}
+
+exports.logout = async(req, res, next)=>{
+    try {
+        // get the token from the request header
+        const {id} = req.user
+        // delete the token from redis to invalidate the session
+        redisClient.del(`user:${id}`)
+
+        res.status(200).json({
+            message: 'logout successful'
+        })
     } catch (error) {
         next(error)
     }

@@ -3,6 +3,7 @@
 const router = require('express').Router()
 
 const { createStaff, getAllStaff, getOneStaff, updateStaff, deleteStaff } = require('../controller/staffController');
+const { createStaffValidator } = require('../middleware/joiValidation');
 const { checkAdmin } = require('../middleware/validation');
 
 /**
@@ -180,7 +181,7 @@ const { checkAdmin } = require('../middleware/validation');
  *                   type: string
  *                   example: Staff already exist
  */
-router.post('/register', checkAdmin, createStaff);
+router.post('/register', createStaffValidator ,checkAdmin, createStaff);
 
 /**
  * @swagger
