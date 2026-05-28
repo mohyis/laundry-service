@@ -13,7 +13,7 @@ const app = express()
 const PORT = 5907
 require('./controller/googleAuth')
 
-const allowedOrigins = ['http://localhost:5173', 'https://spin-cycle.onrender.com'];
+const allowedOrigins = ['http://localhost:5177', 'https://spin-cycle.onrender.com'];
 app.use(cors({origin: allowedOrigins}));
 
 const adminRouter = require('./router/adminRouter')
@@ -22,6 +22,7 @@ const staffRouter = require('./router/staffRouter')
 const customerRouter = require('./router/customerRouter')
 const messageRouter = require('./router/messageRouter')
 const paymentRouter = require('./router/paymentRouter')
+const dashboardRouter = require('./router/dashboardRouter')
 
 
 app.use(express.json())
@@ -34,6 +35,7 @@ app.use('/api/staff', staffRouter)
 app.use('/api/customer', customerRouter)
 app.use('/api/message', messageRouter)
 app.use('/api/payment', paymentRouter)
+app.use('/api/dashboard', dashboardRouter)
 // app.use((req, res , next)=>{
 //     res.status(500).json({
 //         message: `route ${req.originalUrl} and ${req.method} not found`
