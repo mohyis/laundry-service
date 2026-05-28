@@ -31,7 +31,8 @@ exports.authenticator = async(req,res,next)=>{
 
 
 exports.checkAdmin = async(req,res,next)=>{
-    const auth = req.headers.authorization;
+    try {
+        const auth = req.headers.authorization;
     const token = auth.split(' ')[1];
 
     if(!token){
@@ -69,5 +70,14 @@ exports.checkAdmin = async(req,res,next)=>{
         next()
         
     })
+    } catch (error) {
+        if (error instanceof jwt.JsonWebTokenError) {
+        return next({
+            message: 'session expired, login to continue',
+            statusCodel: 400
+        })
+    }
+     next(error)
+    }
 
 };

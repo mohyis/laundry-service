@@ -268,32 +268,32 @@ exports.createStaffValidator = (req, res, next) => {
         professionalCerts: joi.string().optional().allow('').messages({
             'string.base': 'Professional certifications must be a string'
         }),
-        guarantorfirstName: joi.string().pattern(/^[a-zA-Z]{2,}$/).required().messages({
+        guarantorFirstName: joi.string().pattern(/^[a-zA-Z]{2,}$/).optional().messages({
             'any.required': 'Guarantor first name is required',
             'string.empty': 'Guarantor first name cannot be empty',
             'string.pattern.base': 'Guarantor first name cannot contain digits or whitespace and must be at least 2 characters'
         }),
-        guarantorlastName: joi.string().pattern(/^[a-zA-Z]{2,}$/).required().messages({
+        guarantorLastName: joi.string().pattern(/^[a-zA-Z]{2,}$/).optional().messages({
             'any.required': 'Guarantor last name is required',
             'string.empty': 'Guarantor last name cannot be empty',
             'string.pattern.base': 'Guarantor last name cannot contain digits or whitespace and must be at least 2 characters'
         }),
-        guarantorEmail: joi.string().email().required().messages({
+        guarantorEmail: joi.string().email().optional().messages({
             'any.required': 'Guarantor email is required',
             'string.empty': 'Guarantor email cannot be empty',
             'string.email': 'Invalid guarantor email format'
         }),
-        guarantorPhoneNumber: joi.string().pattern(/^\+?[0-9]{7,15}$/).required().messages({
+        guarantorPhoneNumber: joi.string().pattern(/^\+?[0-9]{7,15}$/).optional().messages({
             'any.required': 'Guarantor phone number is required',
             'string.empty': 'Guarantor phone number cannot be empty',
             'string.pattern.base': 'Guarantor phone number must be a valid number between 7 and 15 digits'
         }),
-        guarantorAddress: joi.string().min(5).required().messages({
+        guarantorAddress: joi.string().min(5).optional().messages({
             'any.required': 'Guarantor address is required',
             'string.empty': 'Guarantor address cannot be empty',
             'string.min': 'Guarantor address must be at least 5 characters'
         }),
-        relationship: joi.string().required().messages({
+        relationship: joi.string().optional().messages({
             'any.required': 'Relationship to guarantor is required',
             'string.empty': 'Relationship cannot be empty'
         })

@@ -1,9 +1,10 @@
 const router = require('express').Router()
 const passport = require('passport')
-const { upload } = require('../middleware/multer')
+// const { upload } = require('../middleware/multer')
 const { register, login, logout } = require('../controller/adminController')
 const { loginValidator, registerValidator } = require('../middleware/joiValidation')
 const { authenticator } = require('../middleware/validation')
+const { loginRateLimiter } = require('../middleware/rateLimiter')
 
 
 /**
@@ -24,10 +25,6 @@ const { authenticator } = require('../middleware/validation')
  *           type: string
  *           description: Admin ID
  *           example: 787674563782983746578439
- *         photo:
- *           type: string
- *           format: uri
- *           description: Admin profile picture
  *         firstName:
  *           type: string
  *           description: Admin first name
@@ -70,16 +67,12 @@ const { authenticator } = require('../middleware/validation')
  *           schema:
  *             type: object
  *             required:
- *               - photo
  *               - firstName
  *               - lastName
  *               - email
  *               - password
  *               - confirmPassword
  *             properties:
- *               photo:
- *                 type: string
- *                 example: https://example.com/uploads/admin.jpg
  *               firstName:
  *                 type: string
  *                 example: John
@@ -109,9 +102,6 @@ const { authenticator } = require('../middleware/validation')
  *                 data:
  *                   type: object
  *                   properties:
- *                     photo:
- *                       type: string
- *                       example: https://example.com/uploads/admin.jpg
  *                     firstName:
  *                       type: string
  *                       example: John
@@ -132,7 +122,8 @@ const { authenticator } = require('../middleware/validation')
  *                   type: string
  *                   example: password does not match
  */
-router.post('/register', registerValidator ,upload.single('photo'), register)
+router.post('/register', registerValidator, register)
+// router.post('/register', registerValidator ,upload.single('photo'), register)
 
 
 
@@ -224,7 +215,7 @@ router.post('/register', registerValidator ,upload.single('photo'), register)
  *                   type: string
  *                   example: user not found
  */
-router.post('/login', loginValidator ,login)
+router.post('/login', loginRateLimiter , loginValidator, login)
 
 /**
  * @swagger
