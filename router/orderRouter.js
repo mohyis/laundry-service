@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { createOrder, getAllOrders, getOneOrder, updateOrderStatus, deleteOrder, getCompletedOrderSchedules } = require('../controller/orderController');
+const { createOrder, getAllOrders, getOneOrder, updateOrderStatus, deleteOrder, getCompletedOrderSchedules, getCompleted, getInProgress, getCancelled, getNewRequests } = require('../controller/orderController');
 const { createSchedule, getAllCompletedOrders, getOneSchedule, deleteSchedule, assignStaffToSchedule } = require('../controller/orderController');
 const { createScheduleValidator, updateOrderStatusValidator } = require('../middleware/joiValidation');
 const {scheduleRateLimiter,} = require('../middleware/rateLimiter');
@@ -235,6 +235,245 @@ router.post('/create-order/:id', checkAdmin, createOrder);
  *                         example: new request
  */
 router.get('/orders', checkAdmin, getAllOrders);
+
+
+/**
+ * @swagger
+ * /api/order/new-request:
+ *   get:
+ *     tags:
+ *       - Order
+ *     summary: Get all new requests
+ *     description: Retrieves all new request orders. Requires admin authentication.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: New requests retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: New requests retrieved successfully
+ *                 requiredOrders:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 787674563782983746578439
+ *                       orderId:
+ *                         type: string
+ *                         example: "#SC-1234567"
+ *                       address:
+ *                         type: string
+ *                         example: 12 Lekki Phase 1, Lagos
+ *                       amount:
+ *                         type: number
+ *                         example: 1500
+ *                       paymentMode:
+ *                         type: string
+ *                         example: online
+ *                       bookingDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-05-24T00:00:00.000Z"
+ *                       deliveryDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-06-03T00:00:00.000Z"
+ *                       deliveryMode:
+ *                         type: string
+ *                         example: delivery
+ *                       status:
+ *                         type: string
+ *                         example: new request
+ */
+
+router.get('/new-request', checkAdmin, getNewRequests)
+
+
+/**
+ * @swagger
+ * /api/order/completed-orders:
+ *   get:
+ *     tags:
+ *       - Order
+ *     summary: Get all completed orders
+ *     description: Retrieves all completed orders. Requires admin authentication.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Completed orders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Completed orders retrieved successfully
+ *                 requiredOrders:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 787674563782983746578439
+ *                       orderId:
+ *                         type: string
+ *                         example: "#SC-1234567"
+ *                       address:
+ *                         type: string
+ *                         example: 12 Lekki Phase 1, Lagos
+ *                       amount:
+ *                         type: number
+ *                         example: 1500
+ *                       paymentMode:
+ *                         type: string
+ *                         example: online
+ *                       bookingDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-05-24T00:00:00.000Z"
+ *                       deliveryDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-06-03T00:00:00.000Z"
+ *                       deliveryMode:
+ *                         type: string
+ *                         example: delivery
+ *                       status:
+ *                         type: string
+ *                         example: completed
+ */
+router.get('/completed-orders', checkAdmin, getCompleted)
+
+/**
+ * @swagger
+ * /api/order/pending-orders:
+ *   get:
+ *     tags:
+ *       - Order
+ *     summary: Get all in-progress orders
+ *     description: Retrieves all in-progress orders. Requires admin authentication.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: In-progress orders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: In-progress orders retrieved successfully
+ *                 requiredOrders:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 787674563782983746578439
+ *                       orderId:
+ *                         type: string
+ *                         example: "#SC-1234567"
+ *                       address:
+ *                         type: string
+ *                         example: 12 Lekki Phase 1, Lagos
+ *                       amount:
+ *                         type: number
+ *                         example: 1500
+ *                       paymentMode:
+ *                         type: string
+ *                         example: online
+ *                       bookingDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-05-24T00:00:00.000Z"
+ *                       deliveryDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-06-03T00:00:00.000Z"
+ *                       deliveryMode:
+ *                         type: string
+ *                         example: delivery
+ *                       status:
+ *                         type: string
+ *                         example: in-progress
+ */
+router.get('/pending-orders', checkAdmin, getInProgress)
+
+
+/**
+ * @swagger
+ * /api/order/cancelled-orders:
+ *   get:
+ *     tags:
+ *       - Order
+ *     summary: Get all cancelled orders
+ *     description: Retrieves all cancelled orders. Requires admin authentication.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cancelled orders retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Cancelled orders retrieved successfully
+ *                 requiredOrders:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         example: 787674563782983746578439
+ *                       orderId:
+ *                         type: string
+ *                         example: "#SC-1234567"
+ *                       address:
+ *                         type: string
+ *                         example: 12 Lekki Phase 1, Lagos
+ *                       amount:
+ *                         type: number
+ *                         example: 1500
+ *                       paymentMode:
+ *                         type: string
+ *                         example: online
+ *                       bookingDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-05-24T00:00:00.000Z"
+ *                       deliveryDate:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-06-03T00:00:00.000Z"
+ *                       deliveryMode:
+ *                         type: string
+ *                         example: delivery
+ *                       status:
+ *                         type: string
+ *                         example: cancelled
+ */
+router.get('/cancelled-orders', checkAdmin, getCancelled)
+
+
+
 router.get('/schedules/completed', checkAdmin, getAllCompletedOrders);
 
 /**
@@ -340,6 +579,46 @@ router.get('/orders/:id', checkAdmin, getOneOrder);
 router.put('/order-status/:id', updateOrderStatusValidator ,checkAdmin, updateOrderStatus);
 
 
+/**
+ * @swagger
+ * /api/order/orders/{id}:
+ *   delete:
+ *     tags:
+ *       - Order
+ *     summary: Delete an order
+ *     description: Deletes a specific order by ID. Requires admin authentication.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the order to delete
+ *         schema:
+ *           type: string
+ *           example: 787674563782983746578439
+ *     responses:
+ *       200:
+ *         description: Order deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Order deleted successfully
+ *       404:
+ *         description: Order not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Order not found
+ */
 router.delete('/orders/:id', checkAdmin, deleteOrder);
 
 
