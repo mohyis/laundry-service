@@ -22,16 +22,16 @@ const adminSchema = new mongoose.Schema({
         default: "admin",
         require: true
     },
-    photo: {
-        url: {
-            type: String,
-            require: true
-        },
-        public_id: {
-            type: String,
-            require: true
-        }
-    },
+    // photo: {
+    //     url: {
+    //         type: String,
+    //         require: true
+    //     },
+    //     public_id: {
+    //         type: String,
+    //         require: true
+    //     }
+    // },
     loginAttempts: {
         type: Number,
         default: 0

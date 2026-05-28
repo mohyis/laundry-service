@@ -1,26 +1,26 @@
 const adminModel = require('../models/admin')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const cloudinary = require('../config/cloudinary')
-const fs = require('fs')
+// const cloudinary = require('../config/cloudinary')
+// const fs = require('fs')
 const redisClient = require('../redisConfig/redis')
 
 
-exports.register = async (req, res) => {
-    const file = req.file;
-    console.log("file", file)
+exports.register = async (req, res, next) => {
+    // const file = req.file;
+    // console.log("file", file)
     try {
         const { firstName, lastName, email, password, confirmPassword } = req.body
-        console.log('ada')
-        let result;
+        // console.log('ada')
+        // let result;
 
-        if (req.file) {
-            console.log('req file', req.file)
+        // if (req.file) {
+        //     console.log('req file', req.file)
         
-            result = await cloudinary.uploader.upload(file.path)
-            console.log('cloudinary result', result)
-            fs.unlinkSync(file.path)
-        }
+        //     result = await cloudinary.uploader.upload(file.path)
+        //     console.log('cloudinary result', result)
+        //     fs.unlinkSync(file.path)
+        // }
 
         if (password !== confirmPassword) {
             return res.status(400).json({
@@ -36,10 +36,10 @@ exports.register = async (req, res) => {
             lastName,
             email,
             password: hashedPassword,
-            photo: {
-                url: result.secure_url,
-                public_id: result.public_id
-            }
+            // photo: {
+            //     url: result.secure_url,
+            //     public_id: result.public_id
+            // }
         })
 
         const data = {
@@ -54,14 +54,8 @@ exports.register = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error);
-
-        fs.unlinkSync(file.path)
-        res.status(500).json(
-            {
-                message: error.message
-            }
-        )
+        // fs.unlinkSync(file.path)
+       next(error)
     }
 }
 
