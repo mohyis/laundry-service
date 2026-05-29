@@ -1,16 +1,21 @@
 const paymentModel  = require('../models/payment');
 const orderModel = require('../models/order');
-const otpGen = require('otp-generator');
-const payId = `INV-${otpGen.generate(6, {digits: true, lowerCaseAlphabets: true,upperCaseAlphabets: true, specialChars: false})}`
-const reference = otpGen.generate(12, {digits: true, lowerCaseAlphabets: true,upperCaseAlphabets: true, specialChars: false})
 const axios = require('axios')
 
 exports.payOrder = async(req, res, next)=>{
     try {
-        
+        const otpGen = require('otp-generator');
+        const payId = `INV-${otpGen.generate(6, {digits: true, lowerCaseAlphabets: true,upperCaseAlphabets: true, specialChars: false})}`
+        const reference = otpGen.generate(12, {digits: true, lowerCaseAlphabets: true,upperCaseAlphabets: true, specialChars: false})
         const {id} = req.params;
 
         const order = await orderModel.findById(id)
+
+        if(order.amountPaid){
+            return res.status(400).json({
+                message: 'Access denied, payment cannot be made twice'
+            })
+        }
 
         if(!order){
             return next({
@@ -41,7 +46,6 @@ exports.payOrder = async(req, res, next)=>{
 
         const payment = new paymentModel({
             adminId: order.adminId,
-            customerId: order.customerId,
             orderId: id,
             OrderId: order.orderId,
             paymentId: payId,
@@ -72,8 +76,11 @@ exports.payOrder = async(req, res, next)=>{
 
 exports.verifyPayment = async(req,res, next)=>{
     try {
+
         const { reference } = req.query
         const payment = await paymentModel.findOne({reference});
+        const orderId = payment.OrderId
+        const order = await orderModel.findOne({orderId: orderId})
 
         if(!payment){
             return next({
@@ -90,6 +97,8 @@ exports.verifyPayment = async(req,res, next)=>{
             }
         )
 
+        console.log(data)
+
         if(data.status === true && data.data.status === 'processing') {
             payment.status = 'pending'
 
@@ -101,8 +110,11 @@ exports.verifyPayment = async(req,res, next)=>{
 
         if(data.status === true && data.data.status === 'success') {
             payment.status = 'successful'
+            order.amountPaid = payment.amount
 
             await payment.save();
+            await order.save();
+
             return res.status(200).json({
                 message: 'payment successful'
             })
