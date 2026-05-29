@@ -2,7 +2,6 @@ const orderModel = require('../models/order');
 const staffModel = require('../models/staff')
 const paymentModel = require('../models/payment')
 const orderId = require('otp-generator');
-const generatedOrderId = `#SC-${orderId.generate(7, { lowerCase: false, upperCase: false, specialChars: false, alphabets: false, digits: true })}`;
 const date = new Date();
 const ready = date.setDate(date.getDate() + 2);
 const setReady = new Date(ready);
@@ -10,6 +9,8 @@ const setReady = new Date(ready);
 // endpoint to create schedule for delivery or pickup by customers and admin.
 
 exports.createOrder = async(req,res,next)=>{
+    const generatedOrderId = `#SC-${orderId.generate(7, { lowerCase: false, upperCase: false, specialChars: false, alphabets: false, digits: true })}`;
+
     try {
         const unitPrice = 500;
 

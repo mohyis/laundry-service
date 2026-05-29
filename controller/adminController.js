@@ -93,7 +93,7 @@ exports.login = async (req, res, next) => {
             // increment login attempt and lock account if necessary
 
             user.loginAttempts += 1;
-            if (user.loginAttempts >=5) {
+            if (user.loginAttempts >= 5) {
                 user.lockUntil = new Date(Date.now() + 2 * 60000);
                 user.loginAttempts = 0
             }
@@ -120,7 +120,6 @@ exports.login = async (req, res, next) => {
 
             const data = {
             id: user._id,
-            photo: user.photo,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email
@@ -132,11 +131,10 @@ exports.login = async (req, res, next) => {
             token
         })
 
-
     } catch (error) {
         next(error)
     }
-}
+};
 
 exports.logout = async(req, res, next)=>{
     try {
