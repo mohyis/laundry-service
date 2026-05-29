@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const { createOrder, getAllOrders, getOneOrder, updateOrderStatus, deleteOrder, getCompletedOrderSchedules, getCompleted, getInProgress, getCancelled, getNewRequests } = require('../controller/orderController');
-const { createSchedule, getAllCompletedOrders, getOneSchedule, deleteSchedule, assignStaffToSchedule } = require('../controller/orderController');
-const { createScheduleValidator, updateOrderStatusValidator, createOrderValidator } = require('../middleware/joiValidation');
-const {scheduleRateLimiter,} = require('../middleware/rateLimiter');
+const { getAllOrders, getOneOrder, updateOrderStatus, deleteOrder, getCompletedOrder, getCompleted, getInProgress, getCancelled, getNewRequests, createOrder, assignStaffToOrders } = require('../controller/orderController');
+const { getOrdersWithNoStaffAssigned, assignStaffToSchedule } = require('../controller/orderController');
+const {  updateOrderStatusValidator, createOrderValidator } = require('../middleware/joiValidation');
+const {orderRateLimiter,} = require('../middleware/rateLimiter');
 
 const { checkAdmin } = require('../middleware/validation');
 
@@ -98,82 +98,6 @@ const { checkAdmin } = require('../middleware/validation');
  *           type: string
  *           example: James Brown
  */
-
-/**
- * @swagger
- * /api/order/create-order/{id}:
- *   post:
- *     tags:
- *       - Order
- *     summary: Create an order for an existing customer
- *     description: Admin creates an order for a walk-in or phone-booking customer by their customer MongoDB ID. Requires admin authentication.
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: The Customer MongoDB ID
- *         schema:
- *           type: string
- *           example: 787674563782983746578439
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - pickUpDate
- *               - pickUpTime
- *               - deliveryMode
- *               - paymentMode
- *               - quantity
- *               - amount
- *             properties:
- *               pickUpDate:
- *                 type: string
- *                 format: date
- *                 example: "2026-06-01"
- *               pickUpTime:
- *                 type: string
- *                 example: "10:00 AM"
- *               deliveryMode:
- *                 type: string
- *                 example: delivery
- *               paymentMode:
- *                 type: string
- *                 example: online
- *               item:
- *                 type: string
- *                 example: shirts
- *               specification:
- *                 type: string
- *                 example: dry clean only
- *               quantity:
- *                 type: number
- *                 example: 3
- *               amount:
- *                 type: number
- *                 example: 1500
- *               note:
- *                 type: string
- *                 example: Handle with care
- *     responses:
- *       201:
- *         description: Order created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Order created successfully
- *                 order:
- *                   $ref: '#/components/schemas/Order'
- */
-router.post('/create-order/:id', createOrderValidator, checkAdmin, createOrder);
 
 /**
  * @swagger
@@ -471,7 +395,7 @@ router.get('/cancelled-orders', checkAdmin, getCancelled)
 
 
 
-router.get('/schedules/completed', checkAdmin, getAllCompletedOrders);
+// router.get('/schedules/completed', checkAdmin, assignAllCompletedOrders);
 
 /**
  * @swagger
@@ -681,7 +605,7 @@ router.delete('/orders/:id', checkAdmin, deleteOrder);
 
 /**
  * @swagger
- * /api/order/create-schedule:
+ * /api/order/order/create-order:
  *   post:
  *     tags:
  *       - Order
@@ -770,11 +694,11 @@ router.delete('/orders/:id', checkAdmin, deleteOrder);
  *                   type: string
  *                   example: Please fill in all required fields
  */
-router.post('/create-schedule', createScheduleValidator, scheduleRateLimiter, createSchedule);
+router.post('/create-order', createOrderValidator, orderRateLimiter, createOrder);
 
 /**
  * @swagger
- * /api/order/schedules/completed:
+ * /api/order/order/unassigned-orders:
  *   get:
  *     tags:
  *       - Order
@@ -825,12 +749,12 @@ router.post('/create-schedule', createScheduleValidator, scheduleRateLimiter, cr
  *                         type: string
  *                         example: Not assigned yet
  */
-router.post('/completed-schedule', checkAdmin, getCompletedOrderSchedules)
+router.post('/unassigned-orders', checkAdmin, getOrdersWithNoStaffAssigned);
 
 
 /**
  * @swagger
- * /api/order/schedules/{id}:
+ * /api/order/order/{id}:
  *   put:
  *     tags:
  *       - Order
@@ -905,7 +829,7 @@ router.post('/completed-schedule', checkAdmin, getCompletedOrderSchedules)
  *                   type: string
  *                   example: Staff not found
  */
-router.put('/schedules/:id', checkAdmin, assignStaffToSchedule);
+router.put('/order/:id', checkAdmin, assignStaffToOrders);
 
 module.exports = router;
 

@@ -1,5 +1,4 @@
 const orderModel = require('../models/order');
-const customerModel = require('../models/customer')
 const staffModel = require('../models/staff')
 const paymentModel = require('../models/payment')
 const orderId = require('otp-generator');
@@ -10,7 +9,7 @@ const setReady = new Date(ready);
 
 // endpoint to create schedule for delivery or pickup by customers and admin.
 
-exports.createSchedule = async(req,res,next)=>{
+exports.createOrder = async(req,res,next)=>{
     try {
         const unitPrice = 500;
 
@@ -26,7 +25,7 @@ exports.createSchedule = async(req,res,next)=>{
         item, specification, 
         amount, quantity, 
         note } = req.body;
-    if(!firstName || !pickUpDate || !pickUpTime || !email || !address || !phoneNumber || !deliveryMode || !paymentMode){
+    if(!firstName || !lastName|| !pickUpDate || !pickUpTime || !email || !address || !phoneNumber || !deliveryMode || !item || !specification || !amount || !quantity|| !paymentMode){
         return res.status(400).json({
             message: 'Please fill in all required fields'
         })
@@ -35,7 +34,7 @@ exports.createSchedule = async(req,res,next)=>{
     const ready = date.setDate(date.getDate() + 2);
     const setReady = new Date(ready);
 
-    const schedule = await orderModel.create({
+    const order = await orderModel.create({
         orderId: generatedOrderId,
         firstName,
         lastName,
@@ -56,8 +55,8 @@ exports.createSchedule = async(req,res,next)=>{
         note
     });
     res.status(201).json({
-        message: 'Schedule created successfully',
-        data: schedule
+        message: 'Order Booked successfully',
+        data: order
     })
 
     } catch (error) {
@@ -67,24 +66,24 @@ exports.createSchedule = async(req,res,next)=>{
 
 // Schedule completed orders for delivery/pickup by assigning staff.
 
-exports.getAllCompletedOrders = async(req,res,next)=>{
+exports.getOrdersWithNoStaffAssigned = async(req,res,next)=>{
     try {
-        const schedules = await orderModel.find({ status: 'completed', idStaff: null }) 
-        const requiredSchedules = schedules.map(schedule => {
+        const orders = await orderModel.find({ status: 'completed', idStaff: null }) 
+        const requiredSchedules = orders.map(order => {
             return {
-                _id: schedule._id,
-                orderId: schedule.orderId,
-                address: schedule.address,
-                deliveryMode: schedule.deliveryMode,
-                deliveryDate: schedule.deliveryDate,
-                deliveryTime: schedule.deliveryTime,
-                status: schedule.status,
-                staffName: schedule.staffName || 'Not assigned yet'
+                _id: order._id,
+                orderId: order.orderId,
+                address: order.address,
+                deliveryMode: order.deliveryMode,
+                deliveryDate: order.deliveryDate,
+                deliveryTime: order.deliveryTime,
+                status: order.status,
+                staffName: order.staffName || 'Not assigned yet'
             }
         })
 
         res.status(200).json({
-            message: 'Completed Orders retrieved successfully',
+            message: 'Completed Orders successfully retrieved for assigning',
             requiredSchedules
         })
     } catch (error) {
@@ -94,13 +93,13 @@ exports.getAllCompletedOrders = async(req,res,next)=>{
 
 // assign staff to orders ready for delivery.
 
-exports.assignStaffToSchedule = async(req,res,next)=>{
+exports.assignStaffToOrders = async(req,res,next)=>{
     try {
         const {id} = req.user;
-        const scheduleId = req.params.id
+        const orderId = req.params.id
         const { idStaff, staffName, vehicleType, duty } = req.body;
 
-        const order = await orderModel.findOne(scheduleId);
+        const order = await orderModel.findOne({ orderId: orderId });
         if (order.status !== 'completed') {
             return res.status(400).json({
                 message: 'Only completed orders can be assigned to staff'
@@ -114,7 +113,7 @@ exports.assignStaffToSchedule = async(req,res,next)=>{
             })
         };
 
-        const scheduleUpdate = {
+        const orderUpdate = {
             adminId: id,
             staffId: staff._id,
             idStaff,    
@@ -123,20 +122,20 @@ exports.assignStaffToSchedule = async(req,res,next)=>{
             duty
         };
 
-        const updatedSchedule = await orderModel.findByIdAndUpdate(scheduleId, scheduleUpdate, { new: true });
+        const updatedOrder = await orderModel.findOneAndUpdate({ orderId: orderId }, orderUpdate, { new: true });
     
-        if (!updatedSchedule) {
+        if (!updatedOrder) {
             return res.status(404).json({
-                message: 'Schedule not found'
+                message: 'Order not found'
             });
         }
 
-        updatedSchedule.deliveryTime = new Date(Date.now());
-        await updatedSchedule.save();
+        updatedOrder.deliveryTime = new Date(Date.now());
+        await updatedOrder.save();
 
         res.status(200).json({
             message: 'Staff assigned successfully',
-            data: updatedSchedule
+            data: updatedOrder
         });
     } catch (error) {
         next(error);
@@ -145,100 +144,32 @@ exports.assignStaffToSchedule = async(req,res,next)=>{
 
 
 // To get all completed schedules that has been delivered by staff /picked up by customer Or the orders that have been assigned to a staff for delivery/pickup.
-exports.getCompletedOrderSchedules = async(req,res,next)=>{
+exports.getCompletedOrder = async(req,res,next)=>{
     try {
-        const schedules = await orderModel.find({ status: 'completed' })
-        const requiredSchedules = schedules.map(schedule => {
+        const orders = await orderModel.find({ status: 'completed' })
+        const requiredOrders = orders.map(order => {
             return {
-                _id: schedule._id,
-                orderId: schedule.orderId,
-                address: schedule.address,
-                deliveryMode: schedule.deliveryMode,
-                deliveryDate: schedule.deliveryDate,
-                deliveryTime: schedule.deliveryTime,
-                status: schedule.status,
-                staffName: schedule.staffName
+                _id: order._id,
+                orderId: order.orderId,
+                address: order.address,
+                deliveryMode: order.deliveryMode,
+                deliveryDate: order.deliveryDate,
+                deliveryTime: order.deliveryTime,
+                status: order.status,
+                staffName: order.staffName
             }
         })
 
         res.status(200).json({
             message: 'Completed schedules retrieved successfully',
-            requiredSchedules
+            requiredOrders
          })
     } catch (error) {
         next(error)
     }
 };
 
-// An endpoint to create orders by admin for customers who book through phone calls or walk-in. 
 
-exports.createOrder = async(req,res,next)=>{
-    try {
-        const {id} = req.user;
-        const cusId = req.params.id
-        const { pickUpDate, pickUpTime, deliveryMode, paymentMode, item, specification, quantity, amount, note } = req.body 
-        
-
-        const customer = await customerModel.findById(cusId)
-
-        const order = await orderModel.create({
-            adminId: id,
-            customerId: cusId,
-            orderId: generatedOrderId,
-            firstName: customer.firstName,
-            lastName: customer.lastName,
-            pickUpDate,
-            pickUpTime,
-            email: customer.email,
-            address: customer.address,
-            phoneNumber: customer.phoneNumber,
-            deliveryMode,
-            paymentMode,
-            deliveryDate: setReady,
-            item,
-            specification,
-            quantity,
-            amount,
-            bookingDate: new Date(Date.now()),
-            readyDate: setReady,
-            note
-            
-        })
-        
-        res.status(201).json({
-            message: 'Order created successfully',
-            order
-        })
-    } catch (error) {
-        next(error)
-    }
-};
-
-
-exports.getAllOrders = async(req,res,next)=>{
-    try {
-        const orders = await orderModel.find() 
-        const requiredOrders = orders.map(order => {
-            return {
-                _id: order._id,
-                orderId: order.orderId,
-                address: order.address,
-                amount: order.amount,
-                paymentMode: order.paymentMode,
-                bookingDate: order.bookingDate,
-                deliveryDate: order.deliveryDate,
-                deliveryMode: order.deliveryMode,
-                status: order.status,
-            }
-        })
-        res.status(200).json({
-            message: 'All Orders retrieved successfully',
-            requiredOrders
-        })
-    } catch (error) {
-        next(error)
-    }
-};
 
 exports.updateOrderStatus = async(req,res,next)=>{
     try {
@@ -256,6 +187,31 @@ exports.updateOrderStatus = async(req,res,next)=>{
         res.status(200).json({
             message: 'Order status updated successfully',
             order
+        })
+    } catch (error) {
+        next(error)
+    }
+};
+
+exports.getAllOrders = async(req,res,next)=>{
+    try {
+        const orders = await orderModel.find()
+        const requiredOrders = orders.map(order => {
+            return {
+                _id: order._id,
+                orderId: order.orderId,
+                address: order.address,
+                amount: order.amount,
+                paymentMode: order.paymentMode,
+                bookingDate: order.bookingDate,
+                deliveryDate: order.deliveryDate,
+                deliveryMode: order.deliveryMode,
+                status: order.status
+            }
+        })
+        res.status(200).json({
+            message: 'All orders retrieved successfully',
+            requiredOrders
         })
     } catch (error) {
         next(error)
