@@ -9,10 +9,6 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'staff',
     },
-    customerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'customer',
-    },
     orderId: {
         type: String,  
         required: true,
@@ -92,7 +88,6 @@ const orderSchema = new mongoose.Schema({
     },
     note: {
        type: String,
-       required: true      
     },
     status: {
         type: String,
