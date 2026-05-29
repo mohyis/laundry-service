@@ -11,8 +11,7 @@ const orderSchema = new mongoose.Schema({
     },
     orderId: {
         type: String,  
-        required: true,
-        unique: true
+        required: true
     },
     firstName: {
         type: String,  

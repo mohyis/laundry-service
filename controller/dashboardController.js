@@ -5,9 +5,12 @@ exports.dashboard = async(req, res, next)=>{
     try {
         const {id} = req.user
         const order = await orderModel.find()
-        const totalOrders = order.length
         const inProgress = await orderModel.find({status: 'in-progress'})
         const completed = await orderModel.find({status: 'completed'})
+
+        const totalOrders = order.length
+        const totalInProgress = inProgress.length
+        const totalCompleted = completed.length
 
         const totalRevenue = order.reduce((sum, item) => sum + item.amount, 0)
 
@@ -31,14 +34,13 @@ exports.dashboard = async(req, res, next)=>{
                 message: `welcome back ${data.adminName}`,
                 data,
                 totalOrders,
-                inProgress,
-                completed,
+                totalInProgress,
+                totalCompleted,
                 totalRevenue,
                 latestOrder
             })
-
         
     } catch (error) {
         next(error)
     }
-}
+};
