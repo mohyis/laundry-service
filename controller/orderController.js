@@ -348,7 +348,7 @@ exports.getOneOrder = async(req,res,next)=>{
         }
 
         const payments = {
-             OrderId: payment.OrderId,
+            OrderId: payment.OrderId,
             item: payment.item,
             specification: payment.specification,
             unitPrice: order.unitPrice,
@@ -385,3 +385,29 @@ exports.deleteOrder = async(req,res,next)=>{
         next(error)
     }
 };
+
+
+exports.allCustomer = async(req, res, next) =>{
+    try {
+        const customers = await orderModel.find()
+
+        const requiredCustomer = customers.map(customer => {
+            return {
+                customerId: customer.orderId,
+                customerEmail: customer.email,
+                customerPhoneNumber: customer.phoneNumber,
+                orderAmount: customer.amount,
+                amountSpent: customer.amountPaid,
+                lastOrder: customer.bookingDate
+            }
+        })
+
+        res.status(200).json({
+            message: 'All customers retrieved successfully',
+            requiredCustomer
+        })
+
+    } catch (error) {
+        next(error)
+    }
+}

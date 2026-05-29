@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { getAllOrders, getOneOrder, updateOrderStatus, deleteOrder, getCompletedOrder, getCompleted, getInProgress, getCancelled, getNewRequests, createOrder, assignStaffToOrders } = require('../controller/orderController');
+const { getAllOrders, getOneOrder, updateOrderStatus, deleteOrder, getCompletedOrder, getCompleted, getInProgress, getCancelled, getNewRequests, createOrder, assignStaffToOrders, allCustomer } = require('../controller/orderController');
 const { getOrdersWithNoStaffAssigned, assignStaffToSchedule } = require('../controller/orderController');
 const {  updateOrderStatusValidator, createOrderValidator } = require('../middleware/joiValidation');
 const {orderRateLimiter,} = require('../middleware/rateLimiter');
@@ -831,6 +831,55 @@ router.post('/unassigned-orders', checkAdmin, getOrdersWithNoStaffAssigned);
  *                   example: Staff not found
  */
 router.put('/order/:id', checkAdmin, assignStaffToOrders);
+
+
+/**
+ * @swagger
+ * /api/order/customers:
+ *   get:
+ *     tags:
+ *       - Order
+ *     summary: Get all customers
+ *     description: Retrieves all customers and their order details. Requires admin authentication.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All customers retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: All customers retrieved successfully
+ *                 requiredCustomer:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       customerId:
+ *                         type: string
+ *                         example: "#SC-1234567"
+ *                       customerEmail:
+ *                         type: string
+ *                         example: johndoe@gmail.com
+ *                       customerPhoneNumber:
+ *                         type: string
+ *                         example: "08012345678"
+ *                       orderAmount:
+ *                         type: number
+ *                         example: 5000
+ *                       amountSpent:
+ *                         type: number
+ *                         example: 15000
+ *                       lastOrder:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2026-05-24T00:00:00.000Z"
+ */
+router.get('/customers', checkAdmin, allCustomer)
 
 module.exports = router;
 
